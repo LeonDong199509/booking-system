@@ -1,0 +1,8 @@
+{
+    "name": "booking-system",
+    "version": "1.0.0",
+    "description": "API for book an appointment",
+    "template": {
+        "forceLanguage": "en"
+    }
+}
