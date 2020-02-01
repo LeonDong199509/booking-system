@@ -76,10 +76,12 @@ authorize = (credentials, callback, resApi) => {
 dataBookableDays = (events) => {
     let days = [];
     let daysInMonth = new Date(paramYear,paramMonth,0).getDate();
-    for (i = 0; i < daysInMonth; i++) {
+    for (let i = 0; i < daysInMonth; i++) {
+        console.log(i)
         let has = dateUtil.hasTimeSlots(
-            dateUtil.dateUTC(paramYear,paramMonth-1,i+1,9),
-            dateUtil.dateUTC(paramYear,paramMonth-1,i+1,18),
+            paramYear,
+            paramMonth,
+            i+1,
             events
         );
         days.push({"day": i+1,"hasTimeSlots": has})
@@ -100,7 +102,7 @@ dataBookableDays = (events) => {
 dataFreeSlots = (events) => {
     let timeSlots = [];
     let startTime = dateUtil.dateUTC(paramYear,paramMonth-1,paramDay,9);
-    for (i = 0; i < 12; i++) {
+    for (let i = 0; i < 12; i++) {
         let isFree = dateUtil.isFreeSlot(startTime ,events);
         if (isFree) timeSlots.push({
             "startTime":startTime.toISOString(),

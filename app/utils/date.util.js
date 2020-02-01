@@ -1,20 +1,4 @@
 /**
- *check if there are free slots for this date
- *
- * @param {*} startTime -- the starttime you wanna check
- * @param {*} endTime  -- the endtime you wanna check
- * @param {*} events -- the current events in google calendar
- * @returns
- */
-exports.hasTimeSlots = (startTime,endTime,events) => {
-    let eventsCount = events.filter(element => 
-        new Date (element.start.dateTime) >= startTime & new Date (element.end.dateTime) <= endTime
-    ).length
-    if (eventsCount < 12) return true;
-    return false
-}
-
-/**
  *create UTC date from arguments
  *
  * @param {*} y -- year
@@ -22,9 +6,34 @@ exports.hasTimeSlots = (startTime,endTime,events) => {
  * @param {*} d -- day
  * @param {*} h -- hour
  */
-exports.dateUTC = (y,m,d,h) => (
+const dateUTC = (y,m,d,h) => (
     new Date(Date.UTC(y,m,d,h))
 )
+
+/**
+ *check if there are free slots for this date
+ *
+ * @param {*} startTime -- the starttime you wanna check
+ * @param {*} endTime  -- the endtime you wanna check
+ * @param {*} events -- the current events in google calendar
+ * @returns
+ */
+const hasTimeSlots = (y,m,d,events) => {
+    let startTime = dateUTC(y,m-1,d,9);
+    let timeSlots = [];
+    for (let i = 0; i < 12; i++) {
+        let isFree = isFreeSlot(startTime ,events);
+        if (isFree) timeSlots.push({
+            "startTime":startTime.toISOString(),
+            "endTIme": dateAddMinutes(startTime,40).toISOString()
+        })
+        startTime = dateAddMinutes(startTime,45)
+    }
+    console.log(timeSlots.length)
+    if (timeSlots.length >0) return true;
+    return false;
+}
+
 
 /**
  *compare if the first date greater than second date
@@ -33,7 +42,7 @@ exports.dateUTC = (y,m,d,h) => (
  * @param {*} d2 -- date 2
  * @returns
  */
-exports.compareDates = (d1,d2) => {
+const compareDates = (d1,d2) => {
     if (new Date(d1) > new Date(d2)) return true;
     return false ;
 }
@@ -45,12 +54,15 @@ exports.compareDates = (d1,d2) => {
  * @param {*} m -- the minutes you wanna add
  * @returns
  */
-exports.dateAddMinutes  = (d1,m) => {
+const dateAddMinutes  = (d1,m) => {
     d1 = new Date( d1 )
     let d2 = new Date ( d1 );
     d2.setMinutes ( d1.getMinutes() + m );
     return d2 ;
 }
+
+
+
 
 /**
  *check if a date is legal (not weekend and bt 9-18)
@@ -58,9 +70,9 @@ exports.dateAddMinutes  = (d1,m) => {
  * @param {*} date -- date you wanna check
  * @returns
  */
-exports.checkLegalDates = (date) => {
+const checkLegalDates = (date) => {
     date = new Date(date);
-    if (date.getDay() == 6 || date.getDay() == 0){
+    if (date.getUTCDay() == 6 || date.getUTCDay() == 0){
         return false
     }else if (date.getUTCHours()<9|| date.getUTCHours()>18){
         return false
@@ -75,7 +87,12 @@ exports.checkLegalDates = (date) => {
  * @param {*} events -- current events in calendar
  * @returns
  */
-exports.isFreeSlot = (startTime,events) => {
+const isFreeSlot = (startTime,events) => {
+    let nowTime = (new Date()).toISOString();
+    if (compareDates(nowTime,startTime)) return false;
+    let time24hLater = dateAddMinutes(nowTime,24*60);
+    if (compareDates(time24hLater,startTime)) return false;
+    if (! checkLegalDates(startTime)) return false;
     if (!events || ! events.length) return true ;
     let result = true;
     events.forEach(element => {
@@ -86,3 +103,10 @@ exports.isFreeSlot = (startTime,events) => {
     });
     return result;
 }
+
+exports.dateUTC = dateUTC;
+exports.hasTimeSlots = hasTimeSlots;
+exports.compareDates = compareDates;
+exports.dateAddMinutes = dateAddMinutes;
+exports.checkLegalDates = checkLegalDates;
+exports.isFreeSlot = isFreeSlot;
