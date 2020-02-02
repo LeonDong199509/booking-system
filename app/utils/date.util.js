@@ -29,7 +29,6 @@ const hasTimeSlots = (y,m,d,events) => {
         })
         startTime = dateAddMinutes(startTime,45)
     }
-    console.log(timeSlots.length)
     if (timeSlots.length >0) return true;
     return false;
 }

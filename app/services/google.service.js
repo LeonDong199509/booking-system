@@ -77,7 +77,6 @@ dataBookableDays = (events) => {
     let days = [];
     let daysInMonth = new Date(paramYear,paramMonth,0).getDate();
     for (let i = 0; i < daysInMonth; i++) {
-        console.log(i)
         let has = dateUtil.hasTimeSlots(
             paramYear,
             paramMonth,
