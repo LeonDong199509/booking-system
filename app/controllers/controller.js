@@ -47,12 +47,19 @@ exports.getFreeSlots = (req,res) => {
  */
 exports.bookAppointments= (req,res) => {
     const errors = validationResult(req);
+    const isEmpty = inputObject => {
+        return Object.keys(inputObject).length === 0;
+    };
     if (!errors.isEmpty()) {
         res.status(422).json({ "success": false, "Message": errors.array()[0].msg });
         return;
     }
-
-    let startTime = new Date(Date.UTC(req.body.year,req.body.month-1,req.body.day,req.body.hour, req.body.minute));
+    let startTime;
+    if (!isEmpty(req.body)){
+        startTime = new Date(Date.UTC(req.body.year,req.body.month-1,req.body.day,req.body.hour, req.body.minute));
+    }else if(!isEmpty(req.query)){
+        startTime = new Date(Date.UTC(req.query.year,req.query.month-1,req.query.day,req.query.hour, req.query.minute));
+    }
     let nowTime = (new Date()).toISOString();
     let time24hLater = dateUtil.dateAddMinutes(nowTime,24*60);
     if (dateUtil.compareDates(nowTime,startTime)) return res.status(400).send({
@@ -67,5 +74,9 @@ exports.bookAppointments= (req,res) => {
         "success": false,
         "Message": "Cannot book outside bookable timeframe"
     });
-    googleService.createCalendarEvents(res,3,req.body.year,req.body.month,req.body.day,req.body.hour,req.body.minute);
+    if (!isEmpty(req.body)){
+        googleService.createCalendarEvents(res,3,req.body.year,req.body.month,req.body.day,req.body.hour,req.body.minute);
+    }else if(!isEmpty(req.query)){
+        googleService.createCalendarEvents(res,3,req.query.year,req.query.month,req.query.day,req.query.hour, req.query.minute);
+    }
 }

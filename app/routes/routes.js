@@ -1,4 +1,4 @@
-const { query,body } = require('express-validator');
+const { query,body,check } = require('express-validator');
 module.exports = (app) => {
     const ctrl = require('../controllers/controller.js');
 
@@ -42,15 +42,15 @@ module.exports = (app) => {
     * @apiParam {Number} minute the minute you wanna book.
     */
     app.post('/book',[
-        body('year').exists().withMessage('Request is missing parameter: year')
+        check('year').exists().withMessage('Request is missing parameter: year')
             .isInt().withMessage("year must be a number"),
-        body('month').exists().withMessage('Request is missing parameter: month')
+        check('month').exists().withMessage('Request is missing parameter: month')
             .isInt().withMessage("month must be a number"),
-        body('day').exists().withMessage('Request is missing parameter: day')
+        check('day').exists().withMessage('Request is missing parameter: day')
             .isInt().withMessage("day must be a number"),
-        body('hour').exists().withMessage('Request is missing parameter: hour')
+        check('hour').exists().withMessage('Request is missing parameter: hour')
             .isInt().withMessage("hour must be a number"),
-        body('minute').exists().withMessage('Request is missing parameter: minute')
+        check('minute').exists().withMessage('Request is missing parameter: minute')
             .isInt().withMessage("minute must be a number"),
     ], ctrl.bookAppointments);
 }
